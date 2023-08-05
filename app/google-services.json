@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "415658069668",
+    "project_id": "surfingcompose",
+    "storage_bucket": "surfingcompose.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:415658069668:android:c4c4dd7329d4b1dc782031",
+        "android_client_info": {
+          "package_name": "com.hb.surfingcompose"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "415658069668-6l8ojgcrc8h7ku34b5958qqq222bvnl0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCQxEgw58kF1EXAGPFXxQg8AgLbUxSmLZc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "415658069668-6l8ojgcrc8h7ku34b5958qqq222bvnl0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
