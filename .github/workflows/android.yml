@@ -1,4 +1,4 @@
-name: Android CI
+name: Android CI-CD
 
 on:
   push:
@@ -8,6 +8,7 @@ on:
 
 jobs:
   build: # build app
+    name: 🔨 Build
 
     runs-on: ubuntu-latest
 
@@ -23,9 +24,28 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Build with Gradle
-      run: ./gradlew build
+      run: ./gradlew build # Execute gradle script to perform lint check
+
+  lint-check: # defines another job called lint
+    name: 🔍 Lint
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Lint check
+        run: ./gradlew lint
+
+      - name: Generate lint report
+        uses: actions/upload-artifact@v3
+        with: # Define extra parameters
+          name: lint_report.html # Name of the artifact to be uploaded
+          path: app/build/reports/lint-results-debug.html
+
 
   unit-tests: # Run unit tests
+    name: 🧪 Unit Tests
     needs: [ build ]
     runs-on: ubuntu-latest
 
@@ -60,7 +80,7 @@ jobs:
         run: ./gradlew assembleDebug --stacktrace
 
       - name: Upload debug apk
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v3
         with:
           name: Android-CI-CD
           path: app/build/outputs/apk/debug/app-debug.apk
