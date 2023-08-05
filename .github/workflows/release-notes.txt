@@ -1,0 +1,3 @@
+========== Release notes file ==========
+- Testing deploying app with firebase app distribution
+========================================
