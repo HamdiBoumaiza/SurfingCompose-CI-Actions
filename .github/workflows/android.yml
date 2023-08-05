@@ -25,6 +25,7 @@ jobs:
     - name: Build with Gradle
       run: ./gradlew build
 
+  test:
     - run: echo "Execute unit tests."
     - name: Unit Test
       run: ./gradlew testDebugUnitTest
