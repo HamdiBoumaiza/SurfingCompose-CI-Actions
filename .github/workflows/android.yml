@@ -60,7 +60,7 @@ jobs:
   generate-apk: # Generate debug apk
     name: ⚙️ Generate APK
     needs: [ build, unit-tests, lint-check ]
-    if: github.ref == 'refs/heads/main' # run only on main branch 
+    if: github.ref == 'refs/heads/main' || 'refs/heads/develop'   # run only on main and develop branch
     runs-on: ubuntu-latest
     steps:
 
@@ -86,7 +86,7 @@ jobs:
   firebase-deploy: # Deploy app to firebase app distribution
     name: 📨 Deploy to Firebase App Distribution
     needs: [ generate-apk ]
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' # run only on main branch
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
