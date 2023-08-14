@@ -6,6 +6,10 @@ plugins {
     id 'kotlin-parcelize'
 }
 
+def localPropertiesFile = rootProject.file("local.properties")
+def localProperties = new Properties()
+localProperties.load(new FileInputStream(localPropertiesFile))
+
 android {
     compileSdk 33
 
@@ -21,7 +25,7 @@ android {
             useSupportLibrary true
         }
 
-        buildConfigField "String", "RAPID_API_KEY", RAPID_API_KEY
+        buildConfigField "String", "RAPID_API_KEY", localProperties['apiKey']
 
     }
 
