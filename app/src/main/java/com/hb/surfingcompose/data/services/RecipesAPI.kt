@@ -9,8 +9,8 @@ interface RecipesAPI {
 
     @GET("list")
     suspend fun getRecipes(
-        @Query("from") from: Int,
-        @Query("size") size: Int,
+        @Query("from") from: Int?,
+        @Query("size") size: Int?,
         @Query("q") name: String?
     ): Response<RecipesListResponse>
 }
