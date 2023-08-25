@@ -11,17 +11,16 @@ class RemoteDataSourceImpl @Inject constructor(private val recipesApi: RecipesAP
 
     override suspend fun getRecipes(recipesRequest: RecipesRequest): SurfaceResult<List<RecipeResponse>> {
         return try {
-            recipesApi.getRecipes(recipesRequest.size, recipesRequest.from, recipesRequest.nameOfFood).run {
-                return if (isSuccessful && body() != null) {
+            recipesApi.getRecipes(recipesRequest.from, recipesRequest.size, recipesRequest.nameOfFood).run {
+                if (isSuccessful && body() != null) {
                     SurfaceResult.Success(body()?.results ?: emptyList())
                 } else {
-                    SurfaceResult.Error(java.lang.Exception("Something went wrong"))
+                    SurfaceResult.Error(Exception("Something went wrong , code HTTP : ${code()}"))
                 }
             }
-        } catch (e: Exception) {
-            SurfaceResult.Error(e)
+        } catch (exception: Exception) {
+            SurfaceResult.Error(exception)
         }
     }
-
 
 }

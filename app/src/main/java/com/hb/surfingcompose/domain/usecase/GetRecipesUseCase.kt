@@ -9,7 +9,7 @@ import javax.inject.Inject
 
 class GetRecipesUseCase @Inject constructor(private val repositoryImpl: RecipesRepositoryImpl) {
 
-    suspend operator fun invoke(recipesRequest: RecipesRequest): Flow<SurfaceResult<List<RecipeModel>>>  {
+    suspend operator fun invoke(recipesRequest: RecipesRequest): Flow<SurfaceResult<List<RecipeModel>>> {
         return repositoryImpl.getRecipes(recipesRequest)
     }
 

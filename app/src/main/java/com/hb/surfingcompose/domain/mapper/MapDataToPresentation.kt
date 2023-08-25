@@ -3,12 +3,10 @@ package com.hb.surfingcompose.domain.mapper
 import com.hb.surfingcompose.data.responses.InstructionsResponse
 import com.hb.surfingcompose.data.responses.NutritionResponse
 import com.hb.surfingcompose.data.responses.RecipeResponse
-import com.hb.surfingcompose.data.responses.RecipesListResponse
 import com.hb.surfingcompose.data.responses.TagsResponse
 import com.hb.surfingcompose.domain.models.InstructionsModel
 import com.hb.surfingcompose.domain.models.NutritionModel
 import com.hb.surfingcompose.domain.models.RecipeModel
-import com.hb.surfingcompose.domain.models.RecipesListModel
 import com.hb.surfingcompose.domain.models.TagsModel
 
 

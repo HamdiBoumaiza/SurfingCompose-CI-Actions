@@ -24,6 +24,8 @@ object NetworkModule {
     private const val BASE_URL = "https://tasty.p.rapidapi.com/recipes/"
     private const val TIMEOUT = 30L
     private const val HEADER_KEY = "X-RapidAPI-Key"
+    private const val HEADER_RAPID_API_HOST_KEY = "X-RapidAPI-Host"
+    private const val HEADER_RAPID_API_HOST_VALUE = "tasty.p.rapidapi.com"
 
     @Singleton
     @Provides
@@ -38,7 +40,11 @@ object NetworkModule {
     @Singleton
     @Provides
     fun provideRecipesApi(okHttpClient: OkHttpClient): RecipesAPI {
-        return Retrofit.Builder().addConverterFactory(GsonConverterFactory.create()).baseUrl(BASE_URL).client(okHttpClient).build()
+        return Retrofit
+            .Builder()
+            .addConverterFactory(GsonConverterFactory.create())
+            .baseUrl(BASE_URL).client(okHttpClient)
+            .build()
             .create(RecipesAPI::class.java)
     }
 
@@ -52,6 +58,7 @@ object NetworkModule {
         client.addInterceptor { chain ->
             val request = chain.request().newBuilder()
             request.addHeader(HEADER_KEY, BuildConfig.RAPID_API_KEY)
+            request.addHeader(HEADER_RAPID_API_HOST_KEY, HEADER_RAPID_API_HOST_VALUE)
             chain.proceed(request.build())
         }
         return client.build()
