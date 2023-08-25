@@ -4,4 +4,4 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class InstructionsModel(val displayText: String): Parcelable
+data class InstructionsModel(val displayText: String) : Parcelable

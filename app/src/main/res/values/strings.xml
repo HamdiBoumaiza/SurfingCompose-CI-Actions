@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">SurfingCompose</string>
+    <string name="retry">Retry</string>
+    <string name="search_recipe">Search Recipe...</string>
+    <string name="home">Home</string>
+    <string name="details">Details</string>
 </resources>

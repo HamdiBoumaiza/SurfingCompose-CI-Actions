@@ -1,2 +1,2 @@
 # SurfingCompose
-An app to learn Jetpack Compose
+An app to learn about Jetpack Compose and Github actions

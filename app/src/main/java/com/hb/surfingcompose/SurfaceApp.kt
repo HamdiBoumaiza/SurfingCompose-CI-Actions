@@ -5,10 +5,4 @@ import dagger.hilt.android.HiltAndroidApp
 
 
 @HiltAndroidApp
-class SurfaceApp : Application() {
-
-    override fun onCreate() {
-        super.onCreate()
-    }
-
-}
+class SurfaceApp : Application()
