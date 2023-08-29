@@ -107,7 +107,7 @@ jobs:
           path: app/build/outputs/apk/debug/app-debug.apk
 
   apk-size-tracker: # Generate test apk
-    name: 📚 APK SIZE TRACKER
+    name: 📚 APK METRIC/SIZE TRACKER
     needs: [ build, unit-tests, lint-check ]
     runs-on: ubuntu-latest
     steps:
@@ -119,13 +119,22 @@ jobs:
         with:
           node-version: 16
 
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Upload action step
+        id: apkSize
+        uses: zsfVishnu/apk-metric-upload@v1.0.0
+        with:
+          flavor: debug
+
       - name: Calculate delta
         id: apk-size-tracker
         uses: zsfVishnu/apk-size-tracker@v1.0.0
         with:
           flavor: 'debug'
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          threshold: 0
+          threshold: 1 # Job will fail if the apk size exceed 1MB compared to previous APK
 
 
   generate-apk-test: # Generate test apk
@@ -195,6 +204,11 @@ jobs:
         uses: actions/download-artifact@v1
         with:
           name: Android-APP-APK
+
+      - name: Download TEST APK
+        uses: actions/download-artifact@v1
+        with:
+          name: Android-APP-TEST-APK
 
       - name: Run tests on Firebase Test Lab for API ${{ matrix.api }}
         uses: vacxe/firebase-test-lab-action@0.0.5
