@@ -156,7 +156,7 @@ jobs:
 
   firebase-lab-test: # Test APK with Firebase Test Labs
     name: Test APK with Firebase Test Lab
-    needs: [ generate-apk ]
+    needs: [ generate-apk, generate-apk-test ]
     #if: github.ref == 'refs/heads/main' # run only on main branch
     runs-on: ubuntu-latest
 
