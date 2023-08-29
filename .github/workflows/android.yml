@@ -108,7 +108,7 @@ jobs:
 
   apk-size-tracker: # Generate test apk
     name: 📚 APK METRIC/SIZE TRACKER
-    needs: [ build, unit-tests, lint-check ]
+    needs: [ generate-apk ]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -120,6 +120,11 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
           cache: gradle
+
+      - name: Download APK from build
+        uses: actions/download-artifact@v1
+        with:
+          name: Android-APP-APK
 
       - name: Setup Node
         uses: actions/setup-node@v3
@@ -134,6 +139,7 @@ jobs:
         uses: zsfVishnu/apk-metric-upload@v1.0.0
         with:
           flavor: debug
+          file: Android-APP-APK/app-debug.apk
 
       - name: Calculate delta
         id: apk-size-tracker
@@ -147,6 +153,7 @@ jobs:
   generate-apk-test: # Generate test apk
     name: ⚙️ Generate Test APK
     needs: [ build, unit-tests, lint-check ]
+    if: github.ref == 'refs/heads/main' # run only on main branch
     runs-on: ubuntu-latest
     steps:
 
@@ -172,7 +179,7 @@ jobs:
   firebase-deploy: # Deploy app to firebase app distribution
     name: 📨 Deploy to Firebase App Distribution
     needs: [ generate-apk ]
-    #if: github.ref == 'refs/heads/main' # run only on main branch
+    if: github.ref == 'refs/heads/main' # run only on main branch
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -195,7 +202,7 @@ jobs:
   firebase-lab-test: # Test APK with Firebase Test Labs
     name: 🔬 Test APK with Firebase Test Lab
     needs: [ generate-apk, generate-apk-test ]
-    #if: github.ref == 'refs/heads/main' # run only on main branch
+    if: github.ref == 'refs/heads/main' # run only on main branch
     runs-on: ubuntu-latest
 
     strategy:
