@@ -2,12 +2,17 @@ name: Android CI-CD
 
 on: push
 
+#  push:
+#    branches: [ main ]
+#  pull_request:
+#    branches: [ main ]
+
 jobs:
   build: # build app
     name: 🔨 Build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest # machine the job is going to run inside
 
-    steps:
+    steps: # each job has a series of steps
     - uses: actions/checkout@v3
     - name: set up JDK 17
       uses: actions/setup-java@v3
@@ -101,10 +106,35 @@ jobs:
           name: Android-APP-APK
           path: app/build/outputs/apk/debug/app-debug.apk
 
+  generate-apk-test: # Generate test apk
+    name: ⚙️ Generate Test APK
+    needs: [ build, unit-tests, lint-check ]
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: use JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Build debug apk
+        run: ./gradlew assembleDebugAndroidTest --stacktrace
+
+      - name: Upload debug apk
+        uses: actions/upload-artifact@v3
+        with:
+          name: Android-APP-TEST-APK
+          path: app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
+
   firebase-deploy: # Deploy app to firebase app distribution
     name: 📨 Deploy to Firebase App Distribution
     needs: [ generate-apk ]
-    if: github.ref == 'refs/heads/main' # run only on main branch
+    #if: github.ref == 'refs/heads/main' # run only on main branch
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -123,3 +153,34 @@ jobs:
           groups: testers
           file: Android-APP-APK/app-debug.apk
           releaseNotesFile : app/release_notes/release-notes.txt
+
+  firebase-lab-test: # Test APK with Firebase Test Labs
+    name: Test APK with Firebase Test Lab
+    needs: [ generate-apk ]
+    #if: github.ref == 'refs/heads/main' # run only on main branch
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        api: [ 26, 27, 28, 29, 30, 31, 32, 33 ]
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Download APK
+        uses: actions/download-artifact@v1
+        with:
+          name: Android-APP-APK
+
+      - name: Run tests on Firebase Test Lab for API ${{ matrix.api }}
+        uses: vacxe/firebase-test-lab-action@0.0.5
+        with:
+          app: Android-APP-APK/app-debug.apk
+          test: Android-APP-TEST-APK/app-debug-androidTest.apk
+          device-id: MediumPhone.arm
+          os-version-id: ${{ matrix.api }}
+          num-flaky-test-attempts: 4
+        env:
+          SERVICE_ACCOUNT: ${{ secrets.FIREBASE_TEST_LAB_JSON }}
