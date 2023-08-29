@@ -106,6 +106,28 @@ jobs:
           name: Android-APP-APK
           path: app/build/outputs/apk/debug/app-debug.apk
 
+  apk-size-tracker: # Generate test apk
+    name: 📚 APK SIZE TRACKER
+    needs: [ build, unit-tests, lint-check ]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: Calculate delta
+        id: apk-size-tracker
+        uses: zsfVishnu/apk-size-tracker@v1.0.0
+        with:
+          flavor: 'debug'
+          GITHUB_TOKEN: { { secrets.GITHUB_TOKEN } }
+          threshold: 0
+
+
   generate-apk-test: # Generate test apk
     name: ⚙️ Generate Test APK
     needs: [ build, unit-tests, lint-check ]
@@ -155,7 +177,7 @@ jobs:
           releaseNotesFile : app/release_notes/release-notes.txt
 
   firebase-lab-test: # Test APK with Firebase Test Labs
-    name: Test APK with Firebase Test Lab
+    name: 🔬 Test APK with Firebase Test Lab
     needs: [ generate-apk, generate-apk-test ]
     #if: github.ref == 'refs/heads/main' # run only on main branch
     runs-on: ubuntu-latest
