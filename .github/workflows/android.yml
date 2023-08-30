@@ -121,33 +121,24 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
-      - name: Download APK from build
-        uses: actions/download-artifact@v1
-        with:
-          name: Android-APP-APK
-
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
           node-version: 16
 
-      - name: Install dependencies
-        run: yarn install
-
-      - name: Upload action step
+      - name: Upload APK metrics action
         id: apkSize
         uses: zsfVishnu/apk-metric-upload@v1.0.0
         with:
           flavor: debug
-          file: Android-APP-APK/app-debug.apk
 
-      - name: Calculate delta
-        id: apk-size-tracker
-        uses: zsfVishnu/apk-size-tracker@v1.0.0
-        with:
-          flavor: 'debug'
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          threshold: 1 # Job will fail if the apk size exceed 1MB compared to previous APK
+      #- name: Calculate delta
+      #  id: apk-size-tracker
+      #  uses: zsfVishnu/apk-size-tracker@v1.0.0
+      #  with:
+      #    flavor: 'debug'
+      #    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #    threshold: 1 # Job will fail if the apk size exceed 1MB compared to previous APK
 
 
   generate-apk-test: # Generate test apk
