@@ -132,13 +132,13 @@ jobs:
         with:
           flavor: debug
 
-      #- name: Calculate delta
-      #  id: apk-size-tracker
-      #  uses: zsfVishnu/apk-size-tracker@v1.0.0
-      #  with:
-      #    flavor: 'debug'
-      #    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #    threshold: 1 # Job will fail if the apk size exceed 1MB compared to previous APK
+      - name: Calculate delta
+        id: apk-size-tracker
+        uses: zsfVishnu/apk-size-tracker@v1.0.0
+        with:
+          flavor: 'debug'
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          threshold: 1 # Job will fail if the apk size exceed 1MB compared to previous APK
 
 
   generate-apk-test: # Generate test apk
