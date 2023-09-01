@@ -2,29 +2,34 @@ name: Android CI-CD
 
 on: push
 
+#  push:
+#    branches: [ main ]
+#  pull_request:
+#    branches: [ main ]
+
 jobs:
   build: # build app
     name: 🔨 Build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest # machine the job is going to run inside
 
-    steps:
-    - uses: actions/checkout@v3
-    - name: set up JDK 17
-      uses: actions/setup-java@v3
-      with:
-        java-version: '17'
-        distribution: 'temurin'
-        cache: gradle
+    steps: # each job has a series of steps
+      - uses: actions/checkout@v3
+      - name: set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
 
-    - name: Access RAPID_API_KEY
-      env:
-        RAPID_API_KEY: $
-      run: echo RAPID_API_KEY=\"$RAPID_API_KEY\" > ./local.properties
+      - name: Access RAPID_API_KEY
+        env:
+          RAPID_API_KEY: $
+        run: echo RAPID_API_KEY=\"$RAPID_API_KEY\" > ./local.properties
 
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
-    - name: Build with Gradle
-      run: ./gradlew build # Execute gradle script to perform lint check
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+      - name: Build with Gradle
+        run: ./gradlew build # Execute gradle script to perform lint check
 
   lint-check: # Run lint checks
     name: 🔍 Lint
@@ -58,23 +63,23 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: use JDK 17
-      uses: actions/setup-java@v3
-      with:
-        java-version: '17'
-        distribution: 'temurin'
-        cache: gradle
+      - name: use JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
 
-    - run: echo "Execute unit tests."
-    - name: Unit Test
-      run: ./gradlew testDebugUnitTest
+      - run: echo "Execute unit tests."
+      - name: Unit Test
+        run: ./gradlew testDebugUnitTest
 
-    - name: Android Test Report
-      uses: asadmansr/android-test-report-action@v1.2.0
-      if: ${{ always() }}
+      - name: Android Test Report
+        uses: asadmansr/android-test-report-action@v1.2.0
+        if: ${{ always() }}
 
   generate-apk: # Generate debug apk
     name: ⚙️ Generate APK
@@ -101,6 +106,32 @@ jobs:
           name: Android-APP-APK
           path: app/build/outputs/apk/debug/app-debug.apk
 
+  generate-apk-test: # Generate test apk
+    name: ⚙️ Generate Test APK
+    needs: [ build, unit-tests, lint-check ]
+    if: github.ref == 'refs/heads/main' # run only on main branch
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: use JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Build debug apk
+        run: ./gradlew assembleDebugAndroidTest --stacktrace
+
+      - name: Upload debug apk
+        uses: actions/upload-artifact@v3
+        with:
+          name: Android-APP-TEST-APK
+          path: app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
+
   firebase-deploy: # Deploy app to firebase app distribution
     name: 📨 Deploy to Firebase App Distribution
     needs: [ generate-apk ]
@@ -122,4 +153,40 @@ jobs:
           serviceCredentialsFileContent: ${{ secrets.CREDENTIAL_FILE_CONTENT }}
           groups: testers
           file: Android-APP-APK/app-debug.apk
-          releaseNotesFile : app/release_notes/release-notes.txt
+          releaseNotesFile: app/release_notes/release-notes.txt
+
+  firebase-lab-test: # Test APK with Firebase Test Labs
+    name: 🔬 Test APK with Firebase Test Lab
+    needs: [ generate-apk, generate-apk-test ]
+    if: github.ref == 'refs/heads/main' # run only on main branch
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        api: [ 30, 31, 32, 33 ]
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Download APK
+        uses: actions/download-artifact@v1
+        with:
+          name: Android-APP-APK
+
+      - name: Download TEST APK
+        uses: actions/download-artifact@v1
+        with:
+          name: Android-APP-TEST-APK
+
+      - name: Run tests on Firebase Test Lab for API ${{ matrix.api }}
+        uses: vacxe/firebase-test-lab-action@0.0.5
+        with:
+          app: Android-APP-APK/app-debug.apk
+          test: Android-APP-TEST-APK/app-debug-androidTest.apk
+          device-id: MediumPhone.arm
+          os-version-id: ${{ matrix.api }}
+          num-flaky-test-attempts: 4
+        env:
+          SERVICE_ACCOUNT: ${{ secrets.FIREBASE_TEST_LAB_JSON }}

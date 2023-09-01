@@ -14,7 +14,7 @@ import kotlin.random.Random
 private fun NutritionResponse.toEntity() =
     NutritionEntity(id = Random.nextInt(), fat ?: 0, calories ?: 0, sugar ?: 0, carbohydrates ?: 0, fiber ?: 0, protein ?: 0)
 
-private fun InstructionsResponse.toEntity() = InstructionsEntity(displayText ?: "")
+private fun InstructionsResponse.toEntity() = InstructionsEntity(position ?: 0, displayText ?: "")
 
 private fun TagsResponse.toEntity() = TagsEntity(displayName ?: "", type ?: "")
 

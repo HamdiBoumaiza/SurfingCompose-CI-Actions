@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.Button
 import androidx.compose.material.Card
@@ -121,26 +122,19 @@ fun RecipeList(navController: NavController, viewModel: RecipesViewModel) {
     val isLoading by remember { viewModel.isLoading }
 
     RecipeListView(recipes = recipeList, navController = navController, viewModel = viewModel)
-
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier.fillMaxSize()
     ) {
-        if (isLoading) {
-            CircularProgressIndicator(color = MaterialTheme.colors.primary)
-        }
-        if (errorMessage.isNotEmpty()) {
-            RetryView(error = errorMessage) {
-                viewModel.getRecipesFlow()
-            }
-        }
+        if (isLoading) CircularProgressIndicator(color = MaterialTheme.colors.primary)
+        if (errorMessage.isNotEmpty()) RetryView(error = errorMessage) { viewModel.getRecipesFlow() }
     }
 
 }
 
 @Composable
 fun RecipeListView(recipes: List<RecipeModel>, navController: NavController, viewModel: RecipesViewModel) {
-    LazyColumn(contentPadding = PaddingValues(5.dp)) {
+    LazyColumn(contentPadding = PaddingValues(4.dp)) {
         items(recipes) { recipe ->
             RecipeRow(navController = navController, recipe = recipe, viewModel = viewModel)
         }
@@ -150,10 +144,8 @@ fun RecipeListView(recipes: List<RecipeModel>, navController: NavController, vie
 @Composable
 fun RecipeRow(navController: NavController, recipe: RecipeModel, viewModel: RecipesViewModel) {
     Card(
-        elevation = 10.dp,
-        modifier = Modifier
-            .padding(bottom = 2.dp)
-            .then(Modifier.padding(8.dp)),
+        elevation = 8.dp,
+        modifier = Modifier.padding(4.dp),
     ) {
         Column(modifier = Modifier
             .fillMaxWidth()
@@ -170,16 +162,18 @@ fun RecipeRow(navController: NavController, recipe: RecipeModel, viewModel: Reci
                     .crossfade(true)
                     .build(),
                 placeholder = painterResource(R.drawable.ic_place_holder),
+                error = painterResource(R.drawable.ic_place_holder),
                 contentDescription = recipe.name,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
-                    .clip(shapes.large)
-                    .height(150.dp),
+                    .clip(RoundedCornerShape(20.dp))
+                    .height(150.dp)
+                    .padding(4.dp),
             )
 
             Text(
                 text = recipe.name,
-                style = MaterialTheme.typography.h5,
+                style = MaterialTheme.typography.h6,
                 modifier = Modifier.padding(4.dp),
                 fontWeight = FontWeight.Bold,
                 maxLines = 1,
@@ -188,7 +182,7 @@ fun RecipeRow(navController: NavController, recipe: RecipeModel, viewModel: Reci
             )
             Text(
                 text = recipe.description,
-                style = MaterialTheme.typography.h6,
+                style = MaterialTheme.typography.subtitle2,
                 modifier = Modifier.padding(4.dp),
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
