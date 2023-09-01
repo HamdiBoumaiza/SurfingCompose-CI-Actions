@@ -11,6 +11,4 @@ interface RecipesRepository {
     suspend fun saveRecipes(list: List<RecipeResponse>)
 
     suspend fun getRecipes(recipesRequest: RecipesRequest): Flow<SurfaceResult<List<RecipeModel>>>
-
-    suspend fun getRecipe(id: Int): Flow<RecipeModel>
 }

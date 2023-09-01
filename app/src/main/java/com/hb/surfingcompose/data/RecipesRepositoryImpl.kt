@@ -31,7 +31,4 @@ class RecipesRepositoryImpl @Inject constructor(private val localDataSource: Loc
         } else flow { SurfaceResult.Success(localDataSource.getRecipes().map { it.toPresentation() }) }
     }
 
-    override suspend fun getRecipe(id: Int): Flow<RecipeModel> {
-        return localDataSource.getRecipe(id).map { it.toPresentation() }
-    }
 }

@@ -12,7 +12,7 @@ import com.hb.surfingcompose.domain.models.TagsModel
 
 internal fun NutritionResponse.toPresentation() = NutritionModel(fat ?: 0, calories ?: 0, sugar ?: 0, carbohydrates ?: 0, fiber ?: 0, protein ?: 0)
 
-internal fun InstructionsResponse.toPresentation() = InstructionsModel(displayText ?: "")
+internal fun InstructionsResponse.toPresentation() = InstructionsModel(displayText ?: "", position ?: 0)
 
 internal fun TagsResponse.toPresentation() = TagsModel(displayName ?: "", type ?: "")
 

@@ -23,6 +23,7 @@ object LocalDbModule {
         return Room
             .databaseBuilder(application, RecipesDatabase::class.java, "recipes_database")
             .addTypeConverter(DbConverters())
+            .fallbackToDestructiveMigration()
             .build()
     }
 

@@ -4,5 +4,6 @@ import com.google.gson.annotations.SerializedName
 
 
 data class InstructionsResponse(
-    @SerializedName("display_text") val displayText: String? = null
+    @SerializedName("display_text") val displayText: String? = null,
+    @SerializedName("position") val position : Int? = null
 )

@@ -5,4 +5,4 @@ import androidx.room.PrimaryKey
 
 
 @Entity(tableName = "instruction")
-data class InstructionsEntity(@PrimaryKey val displayText: String)
+data class InstructionsEntity(@PrimaryKey val position: Int, val displayText: String)
