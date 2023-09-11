@@ -1,4 +1,4 @@
-package com.hb.surfingcompose.screens
+package com.hb.surfingcompose.presentation.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -45,12 +45,12 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.hb.surfingcompose.R
-import com.hb.surfingcompose.ROUTE_DETAILS_RECIPES
+import com.hb.surfingcompose.presentation.ROUTE_DETAILS_RECIPES
 import com.hb.surfingcompose.domain.models.RecipeModel
 import com.hb.surfingcompose.domain.request.RecipesRequest
-import com.hb.surfingcompose.viewmodel.RecipesViewModel
-import com.hb.surfingcompose.widgets.AppBar
-import com.hb.surfingcompose.widgets.useDebounce
+import com.hb.surfingcompose.presentation.viewmodel.RecipesViewModel
+import com.hb.surfingcompose.presentation.widgets.AppBar
+import com.hb.surfingcompose.presentation.widgets.useDebounce
 
 @Composable
 fun RecipesListScreen(

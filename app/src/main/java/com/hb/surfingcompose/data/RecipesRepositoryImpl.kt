@@ -9,7 +9,6 @@ import com.hb.surfingcompose.domain.repository.RecipesRepository
 import com.hb.surfingcompose.domain.request.RecipesRequest
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class RecipesRepositoryImpl @Inject constructor(private val localDataSource: LocalDataSource, private val remoteDataSource: RemoteDataSource) :
@@ -20,15 +19,14 @@ class RecipesRepositoryImpl @Inject constructor(private val localDataSource: Loc
     }
 
     override suspend fun getRecipes(recipesRequest: RecipesRequest): Flow<SurfaceResult<List<RecipeModel>>> {
-        return if (isInternetAvailable()) {
-            var result: SurfaceResult<List<RecipeModel>> = SurfaceResult.Loading
+        var result: SurfaceResult<List<RecipeModel>> = SurfaceResult.Loading
+        if (isInternetAvailable()) {
             remoteDataSource.getRecipes(recipesRequest)
                 .onSuccess { response ->
                     saveRecipes(response)
                     result = SurfaceResult.Success(response.toPresentation())
                 }.onError { result = SurfaceResult.Error(it) }
-            flow { emit(result) }
-        } else flow { SurfaceResult.Success(localDataSource.getRecipes().map { it.toPresentation() }) }
+        } else result = SurfaceResult.Success(localDataSource.getRecipes().map { it.toPresentation() })
+        return flow { emit(result) }
     }
-
 }

@@ -1,4 +1,4 @@
-package com.hb.surfingcompose.screens
+package com.hb.surfingcompose.presentation.screens
 
 import android.util.Log
 import androidx.compose.foundation.background
@@ -14,9 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -40,11 +38,11 @@ import coil.request.ImageRequest
 import com.hb.surfingcompose.R
 import com.hb.surfingcompose.domain.models.InstructionsModel
 import com.hb.surfingcompose.domain.models.RecipeModel
-import com.hb.surfingcompose.ui.theme.LightGreen
-import com.hb.surfingcompose.ui.theme.LightYellow
-import com.hb.surfingcompose.viewmodel.RecipesViewModel
-import com.hb.surfingcompose.widgets.AppBar
-import com.hb.surfingcompose.widgets.VideoPlayer
+import com.hb.surfingcompose.presentation.theme.LightGreen
+import com.hb.surfingcompose.presentation.theme.LightYellow
+import com.hb.surfingcompose.presentation.viewmodel.RecipesViewModel
+import com.hb.surfingcompose.presentation.widgets.AppBar
+import com.hb.surfingcompose.presentation.widgets.VideoPlayer
 
 @Composable
 fun RecipeDetailScreen(navController: NavController, viewModel: RecipesViewModel) {
@@ -56,55 +54,58 @@ fun RecipeDetailScreen(navController: NavController, viewModel: RecipesViewModel
 
         ) {
         AppBar(title = stringResource(R.string.details), navController = navController)
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier
-                .padding(16.dp)
-                .verticalScroll(rememberScrollState())
-        ) {
-            Text(
-                text = recipe.name,
-                style = MaterialTheme.typography.h5,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colors.onSurface,
-                textAlign = TextAlign.Center
-            )
+        LazyColumn(contentPadding = PaddingValues(12.dp)) {
+            item {
+                Text(
+                    text = recipe.name,
+                    style = MaterialTheme.typography.h5,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colors.onSurface,
+                    textAlign = TextAlign.Center
+                )
 
-            AsyncImage(
-                model = ImageRequest.Builder(LocalContext.current)
-                    .data(recipe.thumbnailUrl)
-                    .crossfade(true)
-                    .build(),
-                placeholder = painterResource(R.drawable.ic_place_holder),
-                error = painterResource(R.drawable.ic_place_holder),
-                contentDescription = recipe.name,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .padding(top = 16.dp)
-                    .clip(MaterialTheme.shapes.large)
-                    .height(150.dp),
-            )
+                AsyncImage(
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(recipe.thumbnailUrl)
+                        .crossfade(true)
+                        .build(),
+                    placeholder = painterResource(R.drawable.ic_place_holder),
+                    error = painterResource(R.drawable.ic_place_holder),
+                    contentDescription = recipe.name,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .padding(top = 16.dp)
+                        .clip(MaterialTheme.shapes.large)
+                        .height(150.dp),
+                )
 
-            Text(
-                text = recipe.description,
-                fontSize = 14.sp,
-                modifier = Modifier.padding(top = 16.dp),
-                fontWeight = FontWeight.Normal,
-                color = MaterialTheme.colors.primaryVariant,
-                textAlign = TextAlign.Start
-            )
+                Text(
+                    text = recipe.description,
+                    fontSize = 14.sp,
+                    modifier = Modifier.padding(top = 16.dp),
+                    fontWeight = FontWeight.Normal,
+                    color = MaterialTheme.colors.primaryVariant,
+                    textAlign = TextAlign.Start
+                )
 
-            TextSubTitle(resourceString = R.string.nutritional_value)
-            NutritionValues(recipe)
-            Spacer(modifier = Modifier.height(10.dp))
-            TextSubTitle(resourceString = R.string.instructions_list)
-            Spacer(modifier = Modifier.height(10.dp))
-            InstructionsList(recipe.instructions)
-            Spacer(modifier = Modifier.height(10.dp))
-            TextSubTitle(resourceString = R.string.see_how_to)
-            Spacer(modifier = Modifier.height(8.dp))
-            VideoPlayer(recipe.originalVideoUrl)
-            Spacer(modifier = Modifier.height(10.dp))
-            ListTags(recipe)
+                TextSubTitle(resourceString = R.string.nutritional_value)
+                NutritionValues(recipe)
+                Spacer(modifier = Modifier.height(10.dp))
+                TextSubTitle(resourceString = R.string.instructions_list)
+                Spacer(modifier = Modifier.height(10.dp))
+
+            }
+
+            items(items = recipe.instructions) { item -> InstructionRow(item) }
+
+            item {
+                Spacer(modifier = Modifier.height(10.dp))
+                TextSubTitle(resourceString = R.string.see_how_to)
+                Spacer(modifier = Modifier.height(8.dp))
+                VideoPlayer(recipe.originalVideoUrl)
+                Spacer(modifier = Modifier.height(10.dp))
+                ListTags(recipe)
+            }
         }
     }
 }

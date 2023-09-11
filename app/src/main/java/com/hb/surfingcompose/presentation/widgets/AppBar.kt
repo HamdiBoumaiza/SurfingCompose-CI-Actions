@@ -1,4 +1,4 @@
-package com.hb.surfingcompose.widgets
+package com.hb.surfingcompose.presentation.widgets
 
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton

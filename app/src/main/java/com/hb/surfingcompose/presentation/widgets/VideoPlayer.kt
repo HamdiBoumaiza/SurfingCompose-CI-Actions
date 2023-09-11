@@ -1,4 +1,4 @@
-package com.hb.surfingcompose.widgets
+package com.hb.surfingcompose.presentation.widgets
 
 import android.content.Context
 import androidx.compose.foundation.layout.fillMaxSize

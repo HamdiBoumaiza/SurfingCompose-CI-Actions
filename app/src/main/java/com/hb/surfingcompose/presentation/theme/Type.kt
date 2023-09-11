@@ -1,4 +1,4 @@
-package com.hb.surfingcompose.ui.theme
+package com.hb.surfingcompose.presentation.theme
 
 import androidx.compose.material.Typography
 import androidx.compose.ui.text.TextStyle
