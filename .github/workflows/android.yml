@@ -11,11 +11,10 @@ jobs:
   build: # build app
     name: 🔨 Build
     runs-on: ubuntu-latest # machine the job is going to run inside
-    uses: ./.github/workflows/setup_java.yml
 
     steps: # each job has a series of steps
-      - name: Checkout code
-        uses: actions/checkout@v3
+
+      - uses: ./.github/actions/java-set-up
 
       - name: Access RAPID_API_KEY
         env:
@@ -31,12 +30,9 @@ jobs:
     name: 🔍 Lint
     needs: [ build ]
     runs-on: ubuntu-latest
-    uses: ./.github/workflows/setup_java.yml
 
     steps:
-
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - uses: ./.github/actions/java-set-up
 
       - name: Lint check
         run: ./gradlew lint
@@ -52,11 +48,10 @@ jobs:
     name: 🧪 Unit Tests
     needs: [ build ]
     runs-on: ubuntu-latest
-    uses: ./.github/workflows/setup_java.yml
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+
+      - uses: ./.github/actions/java-set-up
 
       - run: echo "Execute unit tests."
       - name: Unit Test
@@ -69,12 +64,9 @@ jobs:
   generate-apk: # Generate debug apk
     name: ⚙️ Generate APK
     needs: [ build, unit-tests, lint-check ]
-    uses: ./.github/workflows/setup_java.yml
     runs-on: ubuntu-latest
     steps:
-
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - uses: ./.github/actions/java-set-up
 
       - name: Build debug apk
         run: ./gradlew assembleDebug --stacktrace
@@ -90,12 +82,10 @@ jobs:
     needs: [ build, unit-tests, lint-check ]
     if: github.ref == 'refs/heads/main' # run only on main branch
     runs-on: ubuntu-latest
-    uses: ./.github/workflows/setup_java.yml
 
     steps:
 
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - uses: ./.github/actions/java-set-up
 
       - name: Build debug apk
         run: ./gradlew assembleDebugAndroidTest --stacktrace
