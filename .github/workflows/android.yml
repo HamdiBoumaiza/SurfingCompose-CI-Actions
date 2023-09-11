@@ -13,6 +13,8 @@ jobs:
     runs-on: ubuntu-latest # machine the job is going to run inside
 
     steps: # each job has a series of steps
+      - name: Checkout code
+        uses: actions/checkout@v3
 
       - uses: ./.github/actions/java-set-up
 
@@ -32,6 +34,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+
+      - name: Checkout code
+        uses: actions/checkout@v3
+
       - uses: ./.github/actions/java-set-up
 
       - name: Lint check
@@ -50,6 +56,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
 
       - uses: ./.github/actions/java-set-up
 
@@ -66,6 +74,10 @@ jobs:
     needs: [ build, unit-tests, lint-check ]
     runs-on: ubuntu-latest
     steps:
+
+      - name: Checkout code
+        uses: actions/checkout@v3
+
       - uses: ./.github/actions/java-set-up
 
       - name: Build debug apk
@@ -84,6 +96,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+
+      - name: Checkout code
+        uses: actions/checkout@v3
 
       - uses: ./.github/actions/java-set-up
 
