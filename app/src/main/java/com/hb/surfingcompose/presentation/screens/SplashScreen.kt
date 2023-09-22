@@ -11,12 +11,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.hb.surfingcompose.R
 import com.hb.surfingcompose.presentation.ROUTE_LIST_RECIPES
 import kotlinx.coroutines.delay
+
+
+private const val DELAY_SPLASH_SCREEN = 2000L
 
 @Composable
 fun SplashScreen(navController: NavController) {
@@ -27,7 +30,7 @@ fun SplashScreen(navController: NavController) {
     ) {
 
         LaunchedEffect(key1 = true, block = {
-            delay(2000)
+            delay(DELAY_SPLASH_SCREEN)
             navController.navigate(ROUTE_LIST_RECIPES)
         })
 
@@ -39,7 +42,7 @@ fun SplashScreen(navController: NavController) {
             Image(
                 painter = painterResource(id = R.drawable.recipe),
                 contentDescription = null,
-                modifier = Modifier.size(150.dp),
+                modifier = Modifier.size(dimensionResource(id = R.dimen.dimens_150dp)),
             )
         }
     }

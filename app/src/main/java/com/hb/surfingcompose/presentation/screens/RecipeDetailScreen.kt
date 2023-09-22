@@ -26,11 +26,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
@@ -54,7 +54,7 @@ fun RecipeDetailScreen(navController: NavController, viewModel: RecipesViewModel
 
         ) {
         AppBar(title = stringResource(R.string.details), navController = navController)
-        LazyColumn(contentPadding = PaddingValues(12.dp)) {
+        LazyColumn(contentPadding = PaddingValues(dimensionResource(id = R.dimen.margin_medium_small))) {
             item {
                 Text(
                     text = recipe.name,
@@ -74,15 +74,15 @@ fun RecipeDetailScreen(navController: NavController, viewModel: RecipesViewModel
                     contentDescription = recipe.name,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
-                        .padding(top = 16.dp)
+                        .padding(top = dimensionResource(id = R.dimen.margin_medium))
                         .clip(MaterialTheme.shapes.large)
-                        .height(150.dp),
+                        .height(dimensionResource(id = R.dimen.dimens_150dp)),
                 )
 
                 Text(
                     text = recipe.description,
                     fontSize = 14.sp,
-                    modifier = Modifier.padding(top = 16.dp),
+                    modifier = Modifier.padding(top = dimensionResource(id = R.dimen.margin_medium)),
                     fontWeight = FontWeight.Normal,
                     color = MaterialTheme.colors.primaryVariant,
                     textAlign = TextAlign.Start
@@ -90,20 +90,20 @@ fun RecipeDetailScreen(navController: NavController, viewModel: RecipesViewModel
 
                 TextSubTitle(resourceString = R.string.nutritional_value)
                 NutritionValues(recipe)
-                Spacer(modifier = Modifier.height(10.dp))
+                Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.margin_small)))
                 TextSubTitle(resourceString = R.string.instructions_list)
-                Spacer(modifier = Modifier.height(10.dp))
+                Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.margin_small)))
 
             }
 
             items(items = recipe.instructions) { item -> InstructionRow(item) }
 
             item {
-                Spacer(modifier = Modifier.height(10.dp))
+                Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.margin_small)))
                 TextSubTitle(resourceString = R.string.see_how_to)
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.margin_small)))
                 VideoPlayer(recipe.originalVideoUrl)
-                Spacer(modifier = Modifier.height(10.dp))
+                Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.margin_small)))
                 ListTags(recipe)
             }
         }
@@ -126,15 +126,15 @@ private fun ListTags(recipe: RecipeModel) {
         LazyRow(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 12.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                .padding(top = dimensionResource(id = R.dimen.margin_medium_small)),
+            horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.margin_small))
         ) { items(recipe.tags) { tag -> TagChip(tag.displayName) } }
     }
 }
 
 @Composable
 private fun InstructionsList(instructions: List<InstructionsModel>) {
-    LazyColumn(contentPadding = PaddingValues(4.dp)) {
+    LazyColumn(contentPadding = PaddingValues(dimensionResource(id = R.dimen.margin_tiny))) {
         items(instructions) { instruction -> InstructionRow(instruction) }
     }
 }
@@ -142,13 +142,13 @@ private fun InstructionsList(instructions: List<InstructionsModel>) {
 @Composable
 fun InstructionRow(instruction: InstructionsModel) {
     Card(
-        elevation = 4.dp,
-        modifier = Modifier.padding(4.dp),
+        elevation = dimensionResource(id = R.dimen.margin_tiny),
+        modifier = Modifier.padding(dimensionResource(id = R.dimen.margin_tiny)),
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 4.dp),
+                .padding(top = dimensionResource(id = R.dimen.margin_tiny)),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -156,7 +156,7 @@ fun InstructionRow(instruction: InstructionsModel) {
             Text(
                 text = instruction.position.toString(),
                 style = MaterialTheme.typography.subtitle2,
-                modifier = Modifier.padding(4.dp),
+                modifier = Modifier.padding(dimensionResource(id = R.dimen.margin_tiny)),
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colors.onSurface
             )
@@ -165,7 +165,7 @@ fun InstructionRow(instruction: InstructionsModel) {
                 text = instruction.displayText,
                 style = MaterialTheme.typography.subtitle2,
                 modifier = Modifier
-                    .padding(4.dp)
+                    .padding(dimensionResource(id = R.dimen.margin_tiny))
                     .weight(1f),
                 color = MaterialTheme.colors.primaryVariant
             )
@@ -179,18 +179,18 @@ fun NutritionView(key: String, value: String, unit: String = "g", backgroundColo
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 4.dp)
-            .background(color = backgroundColor, shape = RoundedCornerShape(8.dp)),
+            .padding(top = dimensionResource(id = R.dimen.margin_tiny))
+            .background(color = backgroundColor, shape = RoundedCornerShape(dimensionResource(id = R.dimen.margin_small))),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Start
     ) {
         Text(
             modifier = Modifier
                 .weight(1f)
-                .padding(4.dp),
+                .padding(dimensionResource(id = R.dimen.margin_tiny)),
             text = key
         )
-        Text(modifier = Modifier.padding(8.dp), text = "$value $unit")
+        Text(modifier = Modifier.padding(dimensionResource(id = R.dimen.margin_small)), text = "$value $unit")
     }
 }
 
@@ -207,7 +207,7 @@ fun TextSubTitle(modifier: Modifier = Modifier, fontWeight: FontWeight = FontWei
     Text(
         text = stringResource(resourceString),
         fontSize = 18.sp,
-        modifier = modifier.padding(top = 16.dp),
+        modifier = modifier.padding(top = dimensionResource(id = R.dimen.margin_medium)),
         fontWeight = fontWeight,
         color = MaterialTheme.colors.onSurface
     )

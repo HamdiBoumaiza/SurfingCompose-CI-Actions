@@ -34,12 +34,12 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
@@ -64,12 +64,12 @@ fun RecipesListScreen(
     ) {
         Column {
             AppBar(title = stringResource(R.string.home), navController = navController)
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.margin_small)))
             SearchBar(
                 hint = stringResource(R.string.search_recipe),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(12.dp)
+                    .padding(dimensionResource(id = R.dimen.margin_medium_small))
             ) { viewModel.getRecipesFlow(RecipesRequest(it)) }
             RecipeList(navController = navController, viewModel = viewModel)
         }
@@ -96,9 +96,9 @@ fun SearchBar(
             textStyle = TextStyle(color = Color.Black),
             modifier = Modifier
                 .fillMaxWidth()
-                .shadow(5.dp, shapes.large)
+                .shadow(dimensionResource(id = R.dimen.margin_tiny), shapes.large)
                 .background(Color.White, shapes.large)
-                .padding(horizontal = 20.dp, vertical = 12.dp)
+                .padding(horizontal = dimensionResource(id = R.dimen.margin_medium_plus), vertical = dimensionResource(id = R.dimen.margin_medium_small))
                 .onFocusChanged {
                     isHintDisplayed = it.isFocused != true && text.isEmpty()
                 }
@@ -108,7 +108,7 @@ fun SearchBar(
                 text = hint,
                 color = Color.LightGray,
                 modifier = Modifier
-                    .padding(horizontal = 20.dp, vertical = 12.dp)
+                    .padding(horizontal = dimensionResource(id = R.dimen.margin_medium_plus), vertical = dimensionResource(id = R.dimen.margin_medium_small))
             )
         }
     }
@@ -134,7 +134,7 @@ fun RecipeList(navController: NavController, viewModel: RecipesViewModel) {
 
 @Composable
 fun RecipeListView(recipes: List<RecipeModel>, navController: NavController, viewModel: RecipesViewModel) {
-    LazyColumn(contentPadding = PaddingValues(4.dp)) {
+    LazyColumn(contentPadding = PaddingValues(dimensionResource(id = R.dimen.margin_tiny))) {
         items(recipes) { recipe ->
             RecipeRow(navController = navController, recipe = recipe, viewModel = viewModel)
         }
@@ -144,8 +144,8 @@ fun RecipeListView(recipes: List<RecipeModel>, navController: NavController, vie
 @Composable
 fun RecipeRow(navController: NavController, recipe: RecipeModel, viewModel: RecipesViewModel) {
     Card(
-        elevation = 8.dp,
-        modifier = Modifier.padding(4.dp),
+        elevation = dimensionResource(id =R.dimen.margin_small) ,
+        modifier = Modifier.padding(dimensionResource(id = R.dimen.margin_tiny)),
     ) {
         Column(modifier = Modifier
             .fillMaxWidth()
@@ -166,15 +166,15 @@ fun RecipeRow(navController: NavController, recipe: RecipeModel, viewModel: Reci
                 contentDescription = recipe.name,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
-                    .clip(RoundedCornerShape(20.dp))
-                    .height(150.dp)
-                    .padding(4.dp),
+                    .clip(RoundedCornerShape(dimensionResource(id = R.dimen.margin_medium_plus)))
+                    .height(dimensionResource(id = R.dimen.dimens_150dp))
+                    .padding(dimensionResource(id = R.dimen.margin_tiny)),
             )
 
             Text(
                 text = recipe.name,
                 style = MaterialTheme.typography.h6,
-                modifier = Modifier.padding(4.dp),
+                modifier = Modifier.padding(dimensionResource(id = R.dimen.margin_tiny)),
                 fontWeight = FontWeight.Bold,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
@@ -183,7 +183,7 @@ fun RecipeRow(navController: NavController, recipe: RecipeModel, viewModel: Reci
             Text(
                 text = recipe.description,
                 style = MaterialTheme.typography.subtitle2,
-                modifier = Modifier.padding(4.dp),
+                modifier = Modifier.padding(dimensionResource(id = R.dimen.margin_tiny)),
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
                 color = MaterialTheme.colors.primaryVariant
@@ -196,7 +196,7 @@ fun RecipeRow(navController: NavController, recipe: RecipeModel, viewModel: Reci
 fun RetryView(error: String, onRetry: () -> Unit) {
     Column {
         Text(error, color = Color.Red, fontSize = 20.sp)
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.margin_medium_small)))
         Button(
             onClick = { onRetry() },
             modifier = Modifier.align(Alignment.CenterHorizontally)
