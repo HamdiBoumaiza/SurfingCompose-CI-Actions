@@ -197,7 +197,7 @@ fun NutritionView(key: String, value: String, unit: String = "g", backgroundColo
 @Composable
 fun TagChip(tag: String) {
     SuggestionChip(
-        onClick = { Log.d("Suggestion chip", "tag") },
+        onClick = { Log.d("Suggestion chip", "tag :$tag") },
         label = { androidx.compose.material3.Text(tag) }
     )
 }

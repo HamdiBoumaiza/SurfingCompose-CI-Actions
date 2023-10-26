@@ -10,11 +10,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.viewinterop.AndroidView
-import com.google.android.exoplayer2.ExoPlayer
-import com.google.android.exoplayer2.MediaItem
-import com.google.android.exoplayer2.ui.PlayerView
+import androidx.media3.common.MediaItem
+import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.ui.PlayerView
+import com.hb.surfingcompose.R
 
 @Composable
 fun VideoPlayer(videoUrl: String) {
@@ -31,7 +32,7 @@ fun VideoPlayer(videoUrl: String) {
     AndroidView(
         modifier = Modifier
             .fillMaxSize()
-            .height(200.dp),
+            .height(dimensionResource(id = R.dimen.dimens_200dp)),
         factory = { playerView }
     )
 }

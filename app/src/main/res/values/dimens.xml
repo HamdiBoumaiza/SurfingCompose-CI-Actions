@@ -6,4 +6,5 @@
     <dimen name="margin_medium">16dp</dimen>
     <dimen name="margin_medium_plus">20dp</dimen>
     <dimen name="dimens_150dp">150dp</dimen>
+    <dimen name="dimens_200dp">200dp</dimen>
 </resources>
