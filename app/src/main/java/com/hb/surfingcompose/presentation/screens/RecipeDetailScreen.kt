@@ -1,4 +1,4 @@
-package com.hb.surfingcompose.screens
+package com.hb.surfingcompose.presentation.screens
 
 import android.util.Log
 import androidx.compose.foundation.background
@@ -14,9 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -28,11 +26,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
@@ -40,11 +38,11 @@ import coil.request.ImageRequest
 import com.hb.surfingcompose.R
 import com.hb.surfingcompose.domain.models.InstructionsModel
 import com.hb.surfingcompose.domain.models.RecipeModel
-import com.hb.surfingcompose.ui.theme.LightGreen
-import com.hb.surfingcompose.ui.theme.LightYellow
-import com.hb.surfingcompose.viewmodel.RecipesViewModel
-import com.hb.surfingcompose.widgets.AppBar
-import com.hb.surfingcompose.widgets.VideoPlayer
+import com.hb.surfingcompose.presentation.theme.LightGreen
+import com.hb.surfingcompose.presentation.theme.LightYellow
+import com.hb.surfingcompose.presentation.viewmodel.RecipesViewModel
+import com.hb.surfingcompose.presentation.widgets.AppBar
+import com.hb.surfingcompose.presentation.widgets.VideoPlayer
 
 @Composable
 fun RecipeDetailScreen(navController: NavController, viewModel: RecipesViewModel) {
@@ -56,55 +54,58 @@ fun RecipeDetailScreen(navController: NavController, viewModel: RecipesViewModel
 
         ) {
         AppBar(title = stringResource(R.string.details), navController = navController)
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier
-                .padding(16.dp)
-                .verticalScroll(rememberScrollState())
-        ) {
-            Text(
-                text = recipe.name,
-                style = MaterialTheme.typography.h5,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colors.onSurface,
-                textAlign = TextAlign.Center
-            )
+        LazyColumn(contentPadding = PaddingValues(dimensionResource(id = R.dimen.margin_medium_small))) {
+            item {
+                Text(
+                    text = recipe.name,
+                    style = MaterialTheme.typography.h5,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colors.onSurface,
+                    textAlign = TextAlign.Center
+                )
 
-            AsyncImage(
-                model = ImageRequest.Builder(LocalContext.current)
-                    .data(recipe.thumbnailUrl)
-                    .crossfade(true)
-                    .build(),
-                placeholder = painterResource(R.drawable.ic_place_holder),
-                error = painterResource(R.drawable.ic_place_holder),
-                contentDescription = recipe.name,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .padding(top = 16.dp)
-                    .clip(MaterialTheme.shapes.large)
-                    .height(150.dp),
-            )
+                AsyncImage(
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(recipe.thumbnailUrl)
+                        .crossfade(true)
+                        .build(),
+                    placeholder = painterResource(R.drawable.ic_place_holder),
+                    error = painterResource(R.drawable.ic_place_holder),
+                    contentDescription = recipe.name,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .padding(top = dimensionResource(id = R.dimen.margin_medium))
+                        .clip(MaterialTheme.shapes.large)
+                        .height(dimensionResource(id = R.dimen.dimens_150dp)),
+                )
 
-            Text(
-                text = recipe.description,
-                fontSize = 14.sp,
-                modifier = Modifier.padding(top = 16.dp),
-                fontWeight = FontWeight.Normal,
-                color = MaterialTheme.colors.primaryVariant,
-                textAlign = TextAlign.Start
-            )
+                Text(
+                    text = recipe.description,
+                    fontSize = 14.sp,
+                    modifier = Modifier.padding(top = dimensionResource(id = R.dimen.margin_medium)),
+                    fontWeight = FontWeight.Normal,
+                    color = MaterialTheme.colors.primaryVariant,
+                    textAlign = TextAlign.Start
+                )
 
-            TextSubTitle(resourceString = R.string.nutritional_value)
-            NutritionValues(recipe)
-            Spacer(modifier = Modifier.height(10.dp))
-            TextSubTitle(resourceString = R.string.instructions_list)
-            Spacer(modifier = Modifier.height(10.dp))
-            InstructionsList(recipe.instructions)
-            Spacer(modifier = Modifier.height(10.dp))
-            TextSubTitle(resourceString = R.string.see_how_to)
-            Spacer(modifier = Modifier.height(8.dp))
-            VideoPlayer(recipe.originalVideoUrl)
-            Spacer(modifier = Modifier.height(10.dp))
-            ListTags(recipe)
+                TextSubTitle(resourceString = R.string.nutritional_value)
+                NutritionValues(recipe)
+                Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.margin_small)))
+                TextSubTitle(resourceString = R.string.instructions_list)
+                Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.margin_small)))
+
+            }
+
+            items(items = recipe.instructions) { item -> InstructionRow(item) }
+
+            item {
+                Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.margin_small)))
+                TextSubTitle(resourceString = R.string.see_how_to)
+                Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.margin_small)))
+                VideoPlayer(recipe.originalVideoUrl)
+                Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.margin_small)))
+                ListTags(recipe)
+            }
         }
     }
 }
@@ -125,15 +126,15 @@ private fun ListTags(recipe: RecipeModel) {
         LazyRow(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 12.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                .padding(top = dimensionResource(id = R.dimen.margin_medium_small)),
+            horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.margin_small))
         ) { items(recipe.tags) { tag -> TagChip(tag.displayName) } }
     }
 }
 
 @Composable
 private fun InstructionsList(instructions: List<InstructionsModel>) {
-    LazyColumn(contentPadding = PaddingValues(4.dp)) {
+    LazyColumn(contentPadding = PaddingValues(dimensionResource(id = R.dimen.margin_tiny))) {
         items(instructions) { instruction -> InstructionRow(instruction) }
     }
 }
@@ -141,13 +142,13 @@ private fun InstructionsList(instructions: List<InstructionsModel>) {
 @Composable
 fun InstructionRow(instruction: InstructionsModel) {
     Card(
-        elevation = 4.dp,
-        modifier = Modifier.padding(4.dp),
+        elevation = dimensionResource(id = R.dimen.margin_tiny),
+        modifier = Modifier.padding(dimensionResource(id = R.dimen.margin_tiny)),
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 4.dp),
+                .padding(top = dimensionResource(id = R.dimen.margin_tiny)),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -155,7 +156,7 @@ fun InstructionRow(instruction: InstructionsModel) {
             Text(
                 text = instruction.position.toString(),
                 style = MaterialTheme.typography.subtitle2,
-                modifier = Modifier.padding(4.dp),
+                modifier = Modifier.padding(dimensionResource(id = R.dimen.margin_tiny)),
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colors.onSurface
             )
@@ -164,7 +165,7 @@ fun InstructionRow(instruction: InstructionsModel) {
                 text = instruction.displayText,
                 style = MaterialTheme.typography.subtitle2,
                 modifier = Modifier
-                    .padding(4.dp)
+                    .padding(dimensionResource(id = R.dimen.margin_tiny))
                     .weight(1f),
                 color = MaterialTheme.colors.primaryVariant
             )
@@ -178,25 +179,25 @@ fun NutritionView(key: String, value: String, unit: String = "g", backgroundColo
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 4.dp)
-            .background(color = backgroundColor, shape = RoundedCornerShape(8.dp)),
+            .padding(top = dimensionResource(id = R.dimen.margin_tiny))
+            .background(color = backgroundColor, shape = RoundedCornerShape(dimensionResource(id = R.dimen.margin_small))),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Start
     ) {
         Text(
             modifier = Modifier
                 .weight(1f)
-                .padding(4.dp),
+                .padding(dimensionResource(id = R.dimen.margin_tiny)),
             text = key
         )
-        Text(modifier = Modifier.padding(8.dp), text = "$value $unit")
+        Text(modifier = Modifier.padding(dimensionResource(id = R.dimen.margin_small)), text = "$value $unit")
     }
 }
 
 @Composable
 fun TagChip(tag: String) {
     SuggestionChip(
-        onClick = { Log.d("Suggestion chip", "tag") },
+        onClick = { Log.d("Suggestion chip", "tag :$tag") },
         label = { androidx.compose.material3.Text(tag) }
     )
 }
@@ -206,7 +207,7 @@ fun TextSubTitle(modifier: Modifier = Modifier, fontWeight: FontWeight = FontWei
     Text(
         text = stringResource(resourceString),
         fontSize = 18.sp,
-        modifier = modifier.padding(top = 16.dp),
+        modifier = modifier.padding(top = dimensionResource(id = R.dimen.margin_medium)),
         fontWeight = fontWeight,
         color = MaterialTheme.colors.onSurface
     )

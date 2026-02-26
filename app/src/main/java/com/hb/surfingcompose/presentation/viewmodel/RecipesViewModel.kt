@@ -1,4 +1,4 @@
-package com.hb.surfingcompose.viewmodel
+package com.hb.surfingcompose.presentation.viewmodel
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel

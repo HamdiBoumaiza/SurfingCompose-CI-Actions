@@ -13,13 +13,10 @@ jobs:
     runs-on: ubuntu-latest # machine the job is going to run inside
 
     steps: # each job has a series of steps
-      - uses: actions/checkout@v3
-      - name: set up JDK 17
-        uses: actions/setup-java@v3
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-          cache: gradle
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - uses: ./.github/actions/java-set-up
 
       - name: Access RAPID_API_KEY
         env:
@@ -35,23 +32,19 @@ jobs:
     name: 🔍 Lint
     needs: [ build ]
     runs-on: ubuntu-latest
+
     steps:
 
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: use JDK 17
-        uses: actions/setup-java@v3
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-          cache: gradle
+      - uses: ./.github/actions/java-set-up
 
       - name: Lint check
         run: ./gradlew lint
 
       - name: Generate lint report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with: # Define extra parameters
           name: lint_report.html # Name of the artifact to be uploaded
           path: app/build/reports/lint-results-debug.html
@@ -66,12 +59,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: use JDK 17
-        uses: actions/setup-java@v3
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-          cache: gradle
+      - uses: ./.github/actions/java-set-up
 
       - run: echo "Execute unit tests."
       - name: Unit Test
@@ -90,18 +78,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: use JDK 17
-        uses: actions/setup-java@v3
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-          cache: gradle
+      - uses: ./.github/actions/java-set-up
 
       - name: Build debug apk
         run: ./gradlew assembleDebug --stacktrace
 
       - name: Upload debug apk
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: Android-APP-APK
           path: app/build/outputs/apk/debug/app-debug.apk
@@ -111,23 +94,19 @@ jobs:
     needs: [ build, unit-tests, lint-check ]
     if: github.ref == 'refs/heads/main' # run only on main branch
     runs-on: ubuntu-latest
+
     steps:
 
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: use JDK 17
-        uses: actions/setup-java@v3
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-          cache: gradle
+      - uses: ./.github/actions/java-set-up
 
       - name: Build debug apk
         run: ./gradlew assembleDebugAndroidTest --stacktrace
 
       - name: Upload debug apk
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: Android-APP-TEST-APK
           path: app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
@@ -142,7 +121,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Download APK from build
-        uses: actions/download-artifact@v1
+        uses: actions/download-artifact@v4
         with:
           name: Android-APP-APK
 
@@ -171,12 +150,12 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Download APK
-        uses: actions/download-artifact@v1
+        uses: actions/download-artifact@v4
         with:
           name: Android-APP-APK
 
       - name: Download TEST APK
-        uses: actions/download-artifact@v1
+        uses: actions/download-artifact@v4
         with:
           name: Android-APP-TEST-APK
 

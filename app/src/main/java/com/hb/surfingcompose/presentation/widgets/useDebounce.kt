@@ -1,4 +1,4 @@
-package com.hb.surfingcompose.widgets
+package com.hb.surfingcompose.presentation.widgets
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
