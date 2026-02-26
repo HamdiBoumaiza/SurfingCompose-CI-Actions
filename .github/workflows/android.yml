@@ -44,7 +44,7 @@ jobs:
         run: ./gradlew lint
 
       - name: Generate lint report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with: # Define extra parameters
           name: lint_report.html # Name of the artifact to be uploaded
           path: app/build/reports/lint-results-debug.html
@@ -84,7 +84,7 @@ jobs:
         run: ./gradlew assembleDebug --stacktrace
 
       - name: Upload debug apk
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: Android-APP-APK
           path: app/build/outputs/apk/debug/app-debug.apk
@@ -106,7 +106,7 @@ jobs:
         run: ./gradlew assembleDebugAndroidTest --stacktrace
 
       - name: Upload debug apk
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: Android-APP-TEST-APK
           path: app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
