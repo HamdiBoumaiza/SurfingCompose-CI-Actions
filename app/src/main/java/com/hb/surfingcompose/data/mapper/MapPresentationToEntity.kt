@@ -11,7 +11,7 @@ import com.hb.surfingcompose.data.responses.TagsResponse
 
 
 private fun List<TagsEntity>.toTagsResponse(): List<TagsResponse> {
-    return map { TagsResponse(displayName = it.displayName, type = it.type) }
+    return map { TagsResponse(displayName = it.displayName, type = it.type, name = it.name) }
 }
 
 private fun List<InstructionsEntity>.toInstructionResponse(): List<InstructionsResponse> {

@@ -21,6 +21,10 @@ class RecipesRepositoryImpl @Inject constructor(
     private val internetConnection: InternetConnection
 ) : RecipesRepository {
 
+    override suspend fun getRecipe(id: Int): RecipeModel? = kotlinx.coroutines.withContext(Dispatchers.IO) {
+        localDataSource.getRecipe(id)?.toPresentation()
+    }
+
     override suspend fun saveRecipes(list: List<RecipeResponse>) {
         localDataSource.saveRecipes(list)
     }
@@ -41,6 +45,12 @@ class RecipesRepositoryImpl @Inject constructor(
                 val query = recipesRequest.nameOfFood.orEmpty().trim()
                 val recipes = localDataSource.getRecipes()
                     .filter { query.isEmpty() || it.name.orEmpty().contains(query, ignoreCase = true) }
+                    .filter { recipe -> (recipesRequest.filterTags + listOfNotNull(recipesRequest.tag)).all { selected ->
+                        recipe.tags.any { tag ->
+                            if (!tag.name.isNullOrBlank() && !selected.name.isNullOrBlank()) tag.name == selected.name
+                            else tag.displayName.orEmpty().equals(selected.displayName, ignoreCase = true)
+                        }
+                    } }
                     .drop(recipesRequest.from.coerceAtLeast(0))
                     .take(recipesRequest.size.coerceAtLeast(0))
                 emit(SurfaceResult.Success(recipes.toPresentation()))

@@ -16,7 +16,7 @@ private fun NutritionResponse.toEntity() =
 
 private fun InstructionsResponse.toEntity() = InstructionsEntity(position ?: 0, displayText ?: "")
 
-private fun TagsResponse.toEntity() = TagsEntity(displayName ?: "", type ?: "")
+private fun TagsResponse.toEntity() = TagsEntity(displayName ?: "", type ?: "", name)
 
 fun List<RecipeResponse>.toEntity(): List<RecipeEntity> {
     return map {

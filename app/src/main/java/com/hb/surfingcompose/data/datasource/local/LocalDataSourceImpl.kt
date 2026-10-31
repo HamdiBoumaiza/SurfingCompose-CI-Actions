@@ -10,5 +10,7 @@ class LocalDataSourceImpl @Inject constructor(private val recipesDao: RecipesDao
 
     override suspend fun saveRecipes(list: List<RecipeResponse>) = recipesDao.insertRecipes(list.toEntity())
 
+    override suspend fun getRecipe(id: Int): RecipeResponse? = recipesDao.recipeById(id)?.toResponse()
+
     override suspend fun getRecipes(): List<RecipeResponse> = recipesDao.queryAllRecipes().map { it.toResponse() }
 }

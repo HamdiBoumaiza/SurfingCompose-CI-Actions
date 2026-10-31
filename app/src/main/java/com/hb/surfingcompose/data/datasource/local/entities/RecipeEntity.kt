@@ -13,5 +13,8 @@ data class RecipeEntity(
     val nutrition: NutritionEntity,
     val description: String,
     val originalVideoUrl: String,
-    val thumbnailUrl: String
+    val thumbnailUrl: String,
+    val prepTimeMinutes: Int? = null,
+    val totalTimeMinutes: Int? = null,
+    val servings: Int? = null
 )

@@ -29,6 +29,8 @@ class RecipesViewModelTest {
 
     private class FakeRepository : RecipesRepository {
         val requests = mutableListOf<String?>()
+        val cached = mutableMapOf<Int, RecipeModel>()
+        override suspend fun getRecipe(id: Int) = cached[id]
         var response: suspend (RecipesRequest) -> Flow<SurfaceResult<List<RecipeModel>>> = {
             flowOf(SurfaceResult.Success(emptyList()))
         }
@@ -41,6 +43,29 @@ class RecipesViewModelTest {
     }
 
     @Test
+    fun tagFilterSurvivesRecreationAndClearingPreservesSearch() = runTest {
+        val requests = mutableListOf<RecipesRequest>()
+        val repository = FakeRepository().apply {
+            response = { requests += it; flowOf(SurfaceResult.Success(emptyList())) }
+        }
+        val state = SavedStateHandle()
+        val viewModel = RecipesViewModel(GetRecipesUseCase(repository), state)
+        viewModel.searchRecipes("soup")
+        val tag = com.hb.surfingcompose.domain.models.TagsModel("Vegetarian", "diet", "vegetarian")
+        viewModel.filterByTag(tag)
+        advanceUntilIdle()
+        assertEquals(tag, requests.last().tag)
+        assertEquals("soup", requests.last().nameOfFood)
+        val restored = RecipesViewModel(GetRecipesUseCase(repository), state)
+        advanceUntilIdle()
+        assertEquals(tag, restored.uiState.value.selectedTag)
+        restored.filterByTag(null)
+        advanceUntilIdle()
+        assertNull(requests.last().tag)
+        assertEquals("soup", requests.last().nameOfFood)
+    }
+
+    @Test
     fun initialLoadAndUnchangedQueryOnlyFetchOnce() = runTest {
         val repository = FakeRepository()
         val viewModel = RecipesViewModel(GetRecipesUseCase(repository), SavedStateHandle())
@@ -48,7 +73,7 @@ class RecipesViewModelTest {
         viewModel.searchRecipes("")
         advanceUntilIdle()
         assertEquals(listOf(""), repository.requests)
-        assertFalse(viewModel.isLoading.value)
+        assertFalse(viewModel.uiState.value.isLoading)
     }
 
     @Test
@@ -72,9 +97,9 @@ class RecipesViewModelTest {
         viewModel.searchRecipes("new")
         advanceUntilIdle()
         assertTrue(cancelled)
-        assertEquals("new", viewModel.recipeList.value.single().name)
-        assertFalse(viewModel.isLoading.value)
-        assertEquals("", viewModel.errorMessage.value)
+        assertEquals("new", viewModel.uiState.value.recipes.single().name)
+        assertFalse(viewModel.uiState.value.isLoading)
+        assertEquals("", viewModel.uiState.value.error)
     }
 
     @Test
@@ -91,7 +116,7 @@ class RecipesViewModelTest {
         runCurrent()
         viewModel.searchRecipes("new")
         advanceUntilIdle()
-        assertEquals("new", viewModel.recipeList.value.single().name)
+        assertEquals("new", viewModel.uiState.value.recipes.single().name)
     }
 
     @Test
@@ -102,17 +127,17 @@ class RecipesViewModelTest {
         repository.response = { flowOf(SurfaceResult.Error(Exception("Network failed"))) }
         viewModel.searchRecipes("soup")
         advanceUntilIdle()
-        assertEquals("Network failed", viewModel.errorMessage.value)
-        assertFalse(viewModel.isLoading.value)
+        assertEquals("Network failed", viewModel.uiState.value.error)
+        assertFalse(viewModel.uiState.value.isLoading)
 
         repository.response = { flow { delay(100); emit(SurfaceResult.Success(listOf(recipe("soup")))) } }
         viewModel.getRecipesFlow()
-        assertTrue(viewModel.isLoading.value)
-        assertEquals("", viewModel.errorMessage.value)
+        assertTrue(viewModel.uiState.value.isLoading)
+        assertEquals("", viewModel.uiState.value.error)
         advanceUntilIdle()
         assertEquals("soup", repository.requests.last())
-        assertEquals("soup", viewModel.recipeList.value.single().name)
-        assertFalse(viewModel.isLoading.value)
+        assertEquals("soup", viewModel.uiState.value.recipes.single().name)
+        assertFalse(viewModel.uiState.value.isLoading)
     }
 
     @Test
@@ -120,8 +145,8 @@ class RecipesViewModelTest {
         val repository = FakeRepository().apply { response = { throw IllegalStateException("Read failed") } }
         val viewModel = RecipesViewModel(GetRecipesUseCase(repository), SavedStateHandle())
         advanceUntilIdle()
-        assertEquals("Read failed", viewModel.errorMessage.value)
-        assertFalse(viewModel.isLoading.value)
+        assertEquals("Read failed", viewModel.uiState.value.error)
+        assertFalse(viewModel.uiState.value.isLoading)
     }
 
     @Test
@@ -129,6 +154,7 @@ class RecipesViewModelTest {
         val repository = FakeRepository()
         val state = SavedStateHandle()
         val original = RecipesViewModel(GetRecipesUseCase(repository), state)
+        repository.cached[1] = recipe("soup")
         original.setRecipe(recipe("soup"))
         original.searchRecipes("soup")
         advanceUntilIdle()
@@ -137,7 +163,9 @@ class RecipesViewModelTest {
         val restored = RecipesViewModel(GetRecipesUseCase(repository), restoredState)
         advanceUntilIdle()
         assertEquals(original.getRecipe(), restored.getRecipe())
-        assertEquals("soup", restored.searchQuery.value)
+        assertEquals(1, restoredState.get<Int>("selected_recipe_id"))
+        assertFalse(restoredState.contains("selected_recipe"))
+        assertEquals("soup", restored.uiState.value.query)
         assertEquals("soup", repository.requests.last())
     }
 

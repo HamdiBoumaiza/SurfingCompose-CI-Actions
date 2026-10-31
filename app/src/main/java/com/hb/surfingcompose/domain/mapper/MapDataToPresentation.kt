@@ -14,7 +14,7 @@ internal fun NutritionResponse.toPresentation() = NutritionModel(fat ?: 0, calor
 
 internal fun InstructionsResponse.toPresentation() = InstructionsModel(displayText ?: "", position ?: 0)
 
-internal fun TagsResponse.toPresentation() = TagsModel(displayName ?: "", type ?: "")
+internal fun TagsResponse.toPresentation() = TagsModel(displayName ?: "", type ?: "", name)
 
 internal fun RecipeResponse.toPresentation() = RecipeModel(
     id ?: 0,
@@ -24,7 +24,8 @@ internal fun RecipeResponse.toPresentation() = RecipeModel(
     nutrition?.toPresentation() ?: NutritionModel(),
     description ?: "",
     originalVideoUrl ?: "",
-    thumbnailUrl ?: ""
+    thumbnailUrl ?: "",
+    prepTimeMinutes, totalTimeMinutes, servings
 )
 
 internal fun List<RecipeResponse>.toPresentation(): List<RecipeModel> = map { it.toPresentation() }

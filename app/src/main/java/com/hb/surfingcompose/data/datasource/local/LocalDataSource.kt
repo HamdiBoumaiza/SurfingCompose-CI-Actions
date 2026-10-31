@@ -7,6 +7,8 @@ interface LocalDataSource {
 
     suspend fun saveRecipes(list: List<RecipeResponse>)
 
+    suspend fun getRecipe(id: Int): com.hb.surfingcompose.data.responses.RecipeResponse? = getRecipes().firstOrNull { it.id == id }
+
     suspend fun getRecipes(): List<RecipeResponse>
 
 }

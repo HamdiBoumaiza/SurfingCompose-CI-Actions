@@ -5,5 +5,6 @@ import com.google.gson.annotations.SerializedName
 
 data class TagsResponse(
     @SerializedName("display_name") val displayName: String? = null,
-    @SerializedName("type") val type: String? = null
+    @SerializedName("type") val type: String? = null,
+    @SerializedName("name") val name: String? = null
 )

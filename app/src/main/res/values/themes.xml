@@ -1,6 +1,13 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
+<resources>
     <style name="Theme.SurfingCompose" parent="android:Theme.Material.Light.NoActionBar">
-        <item name="android:statusBarColor">@color/black</item>
+        <item name="android:windowBackground">@color/launch_background</item>
+        <item name="android:statusBarColor">@color/launch_background</item>
+        <item name="android:navigationBarColor">@color/launch_background</item>
+    </style>
+    <style name="Theme.SurfingCompose.Starting" parent="Theme.SplashScreen.IconBackground">
+        <item name="windowSplashScreenBackground">@color/launch_background</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
+        <item name="windowSplashScreenIconBackgroundColor">@color/launcher_background</item>
+        <item name="postSplashScreenTheme">@style/Theme.SurfingCompose</item>
     </style>
 </resources>

@@ -8,6 +8,8 @@ import kotlinx.coroutines.flow.Flow
 
 interface RecipesRepository {
 
+    suspend fun getRecipe(id: Int): RecipeModel? = null
+
     suspend fun saveRecipes(list: List<RecipeResponse>)
 
     suspend fun getRecipes(recipesRequest: RecipesRequest): Flow<SurfaceResult<List<RecipeModel>>>

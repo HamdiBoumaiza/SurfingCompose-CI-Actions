@@ -11,5 +11,8 @@ data class RecipeResponse(
     @SerializedName("nutrition") val nutrition: NutritionResponse? = null,
     @SerializedName("description") val description: String? = null,
     @SerializedName("original_video_url") val originalVideoUrl: String? = null,
-    @SerializedName("thumbnail_url") val thumbnailUrl: String? = null
+    @SerializedName("thumbnail_url") val thumbnailUrl: String? = null,
+    @SerializedName("prep_time_minutes") val prepTimeMinutes: Int? = null,
+    @SerializedName("total_time_minutes") val totalTimeMinutes: Int? = null,
+    @SerializedName("num_servings") val servings: Int? = null
 )

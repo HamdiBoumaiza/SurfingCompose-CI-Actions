@@ -5,15 +5,12 @@ import android.os.Parcel
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.ComponentActivity
-import androidx.compose.material.Text
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.lifecycle.SavedStateHandle
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.hb.surfingcompose.data.SurfaceResult
@@ -25,11 +22,12 @@ import com.hb.surfingcompose.domain.repository.RecipesRepository
 import com.hb.surfingcompose.domain.request.RecipesRequest
 import com.hb.surfingcompose.domain.usecase.GetRecipesUseCase
 import com.hb.surfingcompose.presentation.ROUTE_LIST_RECIPES
-import com.hb.surfingcompose.presentation.ROUTE_SPLASH_SCREEN
-import com.hb.surfingcompose.presentation.screens.SplashScreen
+import com.hb.surfingcompose.presentation.activities.RecipesNavigation
+import com.hb.surfingcompose.presentation.theme.SurfingComposeTheme
 import com.hb.surfingcompose.presentation.viewmodel.RecipesViewModel
 import com.hb.surfingcompose.presentation.widgets.VideoPlayer
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.runBlocking
 import org.junit.Assert.*
 import org.junit.Rule
 import org.junit.Test
@@ -40,18 +38,24 @@ class RecipeLifecycleTest {
     @get:Rule val composeRule = createAndroidComposeRule<ComponentActivity>()
 
     @Test
-    fun splashIsRemovedFromBackStack() {
+    fun startupOpensRecipesWithoutASplashBackStackEntry() {
+        val repository = object : RecipesRepository {
+            override suspend fun saveRecipes(list: List<RecipeResponse>) = Unit
+            override suspend fun getRecipes(recipesRequest: RecipesRequest) =
+                flowOf(SurfaceResult.Success(emptyList<RecipeModel>()))
+        }
         lateinit var navigation: NavHostController
         composeRule.setContent {
-            navigation = rememberNavController()
-            NavHost(navigation, startDestination = ROUTE_SPLASH_SCREEN) {
-                composable(ROUTE_SPLASH_SCREEN) { SplashScreen(navigation) }
-                composable(ROUTE_LIST_RECIPES) { Text("Recipes") }
+            val viewModel = androidx.compose.runtime.remember {
+                RecipesViewModel(GetRecipesUseCase(repository), SavedStateHandle())
             }
+            navigation = rememberNavController()
+            SurfingComposeTheme { RecipesNavigation(navigation, viewModel) }
         }
-        composeRule.mainClock.advanceTimeBy(2100)
-        composeRule.waitUntil(5000) { navigation.currentDestination?.route == ROUTE_LIST_RECIPES }
-        composeRule.runOnIdle { assertNull(navigation.previousBackStackEntry) }
+        composeRule.runOnIdle {
+            assertEquals(ROUTE_LIST_RECIPES, navigation.currentDestination?.route)
+            assertNull(navigation.previousBackStackEntry)
+        }
     }
 
     @Test
@@ -73,30 +77,32 @@ class RecipeLifecycleTest {
     }
 
     @Test
-    fun selectedRecipeSurvivesSavedStateParcelRoundTrip() {
+    fun selectedRecipeIdSurvivesSavedStateParcelRoundTrip() {
+        val soup = RecipeModel(7, "Soup", instructions = listOf(InstructionsModel("Cook", 1)), nutrition = NutritionModel(), description = "Warm soup", originalVideoUrl = "", thumbnailUrl = "")
         val repository = object : RecipesRepository {
             override suspend fun saveRecipes(list: List<RecipeResponse>) = Unit
+            override suspend fun getRecipe(id: Int) = soup.takeIf { it.id == id }
             override suspend fun getRecipes(recipesRequest: RecipesRequest) = flowOf(SurfaceResult.Success(emptyList<RecipeModel>()))
         }
+        lateinit var restored: RecipesViewModel
         composeRule.runOnIdle {
             val state = SavedStateHandle()
             val original = RecipesViewModel(GetRecipesUseCase(repository), state)
-            original.setRecipe(RecipeModel(
-                id = 7, name = "Soup", instructions = listOf(InstructionsModel("Cook", 1)),
-                nutrition = NutritionModel(), description = "Warm soup", originalVideoUrl = "", thumbnailUrl = ""
-            ))
+            original.setRecipe(soup)
+            original.setCompletedSteps(soup.id, setOf(1))
+            assertFalse(state.contains("selected_recipe"))
             val parcel = Parcel.obtain()
             try {
                 parcel.writeBundle(state.savedStateProvider().saveState())
                 parcel.setDataPosition(0)
                 val restoredBundle: Bundle = parcel.readBundle(RecipeModel::class.java.classLoader)!!
-                val restored = RecipesViewModel(
-                    GetRecipesUseCase(repository), SavedStateHandle.createHandle(restoredBundle, null)
-                )
-                assertEquals(original.getRecipe(), restored.getRecipe())
-            } finally {
-                parcel.recycle()
-            }
+                restored = RecipesViewModel(GetRecipesUseCase(repository), SavedStateHandle.createHandle(restoredBundle, null))
+            } finally { parcel.recycle() }
+        }
+        composeRule.waitUntil(5000) { restored.uiState.value.selectedRecipe != null }
+        composeRule.runOnIdle {
+            assertEquals(soup, restored.getRecipe())
+            assertEquals(setOf(1), restored.uiState.value.completedSteps)
         }
     }
 

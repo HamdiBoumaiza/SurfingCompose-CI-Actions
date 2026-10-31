@@ -11,6 +11,7 @@ interface RecipesAPI {
     suspend fun getRecipes(
         @Query("from") from: Int?,
         @Query("size") size: Int?,
-        @Query("q") name: String?
+        @Query("q") name: String?,
+        @Query("tags") tags: String? = null
     ): Response<RecipesListResponse>
 }
