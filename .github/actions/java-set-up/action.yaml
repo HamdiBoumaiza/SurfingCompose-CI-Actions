@@ -1,5 +1,5 @@
-name: Checkout and set java version
-description: Sets up Java
+name: Set up Java and Android SDK
+description: Sets up Java and the Android SDK tools required by CI
 runs:
   using: "composite"
   steps:
@@ -9,6 +9,8 @@ runs:
         java-version: '21'
         distribution: 'temurin'
         cache: gradle
+    - name: Set up Android SDK
+      uses: android-actions/setup-android@v4
     - name: Install required Android SDK packages
       shell: bash
       run: sdkmanager 'platforms;android-37.0' 'build-tools;36.0.0'
