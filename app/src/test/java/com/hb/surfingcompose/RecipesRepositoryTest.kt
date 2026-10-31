@@ -52,6 +52,31 @@ class RecipesRepositoryTest {
     }
 
     @Test
+    fun offlineTagFilterUsesApiNameAndFiltersBeforePagination() = runTest {
+        val tag = com.hb.surfingcompose.domain.models.TagsModel("Quick meals", "", "under_30_minutes")
+        val cache = MemoryCache(listOf(
+            recipe("Soup one").copy(tags = listOf(com.hb.surfingcompose.data.responses.TagsResponse("Different label", "", "under_30_minutes"))),
+            recipe("Soup two"),
+            recipe("Soup three").copy(tags = listOf(com.hb.surfingcompose.data.responses.TagsResponse("Quick meals", "")))
+        ))
+        val results = RecipesRepositoryImpl(cache, RemoteRecipes(), InternetConnection { false })
+            .getRecipes(RecipesRequest(1, 1, "soup", tag)).toList()
+        assertEquals(listOf("Soup three"), success(results.last()).map { it.name })
+    }
+
+    @Test fun offlineCombinedFiltersMatchAllCategoriesBeforePagination() = runTest {
+        val vegan = com.hb.surfingcompose.domain.models.TagsModel("Vegan", "diet", "vegan")
+        val quick = com.hb.surfingcompose.domain.models.TagsModel("Quick", "time", "under_30_minutes")
+        val cache = MemoryCache(listOf(
+            recipe("Soup one").copy(tags = listOf(com.hb.surfingcompose.data.responses.TagsResponse("Vegan", "diet", "vegan"))),
+            recipe("Soup two").copy(tags = listOf(com.hb.surfingcompose.data.responses.TagsResponse("Vegan", "diet", "vegan"), com.hb.surfingcompose.data.responses.TagsResponse("Quick", "time", "under_30_minutes")))
+        ))
+        val results = RecipesRepositoryImpl(cache, RemoteRecipes(), InternetConnection { false })
+            .getRecipes(RecipesRequest(0, 30, "soup", filterTags = listOf(vegan, quick))).toList()
+        assertEquals(listOf("Soup two"), success(results.last()).map { it.name })
+    }
+
+    @Test
     fun unmatchedOfflineQueryReturnsEmptyList() = runTest {
         val results = RecipesRepositoryImpl(MemoryCache(listOf(recipe("Pasta"))), RemoteRecipes(), InternetConnection { false })
             .getRecipes(RecipesRequest("soup")).toList()

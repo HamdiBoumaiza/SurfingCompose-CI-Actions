@@ -12,5 +12,8 @@ data class RecipeModel(
     val nutrition: NutritionModel,
     val description: String,
     val originalVideoUrl: String,
-    val thumbnailUrl: String
+    val thumbnailUrl: String,
+    val prepTimeMinutes: Int? = null,
+    val totalTimeMinutes: Int? = null,
+    val servings: Int? = null
 ) : Parcelable

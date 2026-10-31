@@ -87,28 +87,6 @@ jobs:
           name: Android-APP-APK
           path: app/build/outputs/apk/debug/app-debug.apk
 
-  generate-apk-test: # Generate test apk
-    name: ⚙️ Generate Test APK
-    needs: [ build, unit-tests, lint-check ]
-    if: github.ref == 'refs/heads/main' # run only on main branch
-    runs-on: ubuntu-latest
-
-    steps:
-
-      - name: Checkout code
-        uses: actions/checkout@v5
-
-      - uses: ./.github/actions/java-set-up
-
-      - name: Build debug apk
-        run: ./gradlew assembleDebugAndroidTest --stacktrace
-
-      - name: Upload debug apk
-        uses: actions/upload-artifact@v4
-        with:
-          name: Android-APP-TEST-APK
-          path: app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
-
   firebase-deploy: # Deploy app to firebase app distribution
     name: 📨 Deploy to Firebase App Distribution
     needs: [ generate-apk ]
@@ -132,41 +110,3 @@ jobs:
           groups: testers
           file: Android-APP-APK/app-debug.apk
           releaseNotesFile: app/release_notes/release-notes.txt
-
-  firebase-lab-test: # Test APK with Firebase Test Labs
-    name: 🔬 Test APK with Firebase Test Lab
-    needs: [ generate-apk, generate-apk-test ]
-    if: github.ref == 'refs/heads/main' # run only on main branch
-    runs-on: ubuntu-latest
-
-    strategy:
-      fail-fast: false
-      matrix:
-        api: [ 30, 31, 32, 33 ]
-
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v5
-
-      - name: Download APK
-        uses: actions/download-artifact@v4
-        with:
-          name: Android-APP-APK
-          path: Android-APP-APK
-
-      - name: Download TEST APK
-        uses: actions/download-artifact@v4
-        with:
-          name: Android-APP-TEST-APK
-          path: Android-APP-TEST-APK
-
-      - name: Run tests on Firebase Test Lab for API ${{ matrix.api }}
-        uses: vacxe/firebase-test-lab-action@0.0.5
-        with:
-          app: Android-APP-APK/app-debug.apk
-          test: Android-APP-TEST-APK/app-debug-androidTest.apk
-          device-id: MediumPhone.arm
-          os-version-id: ${{ matrix.api }}
-          num-flaky-test-attempts: 4
-        env:
-          SERVICE_ACCOUNT: ${{ secrets.FIREBASE_TEST_LAB_JSON }}

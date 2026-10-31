@@ -1,6 +1,9 @@
 package com.hb.surfingcompose.di
 
 import android.app.Application
+import android.content.Context
+import com.hb.surfingcompose.domain.library.RecipeLibrary
+import com.hb.surfingcompose.data.library.RoomRecipeLibrary
 import androidx.room.Room
 import com.hb.surfingcompose.data.datasource.local.DbConverters
 import com.hb.surfingcompose.data.datasource.local.LocalDataSource
@@ -17,13 +20,18 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object LocalDbModule {
 
+    @Provides
+    @Singleton
+    fun provideRecipeLibrary(application: Application, database: RecipesDatabase): RecipeLibrary =
+        RoomRecipeLibrary(database, application.getSharedPreferences("recipe_library", Context.MODE_PRIVATE))
+
     @Singleton
     @Provides
     fun provideStarDatabase(application: Application): RecipesDatabase {
         return Room
             .databaseBuilder(application, RecipesDatabase::class.java, "recipes_database")
             .addTypeConverter(DbConverters())
-            .fallbackToDestructiveMigration()
+            .addMigrations(RecipesDatabase.MIGRATION_3_4, RecipesDatabase.MIGRATION_4_5)
             .build()
     }
 
