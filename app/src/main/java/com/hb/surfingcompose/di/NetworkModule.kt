@@ -1,6 +1,8 @@
 package com.hb.surfingcompose.di
 
 import com.hb.surfingcompose.BuildConfig
+import com.hb.surfingcompose.data.InternetConnection
+import com.hb.surfingcompose.data.isInternetAvailable
 import com.hb.surfingcompose.data.RecipesRepositoryImpl
 import com.hb.surfingcompose.data.datasource.local.LocalDataSource
 import com.hb.surfingcompose.data.datasource.remote.RemoteDataSource
@@ -29,8 +31,14 @@ object NetworkModule {
 
     @Singleton
     @Provides
-    fun provideRecipesRepository(localDataSource: LocalDataSource, remoteDataSource: RemoteDataSource): RecipesRepository =
-        RecipesRepositoryImpl(localDataSource, remoteDataSource)
+    fun provideRecipesRepository(
+        localDataSource: LocalDataSource,
+        remoteDataSource: RemoteDataSource,
+        internetConnection: InternetConnection
+    ): RecipesRepository = RecipesRepositoryImpl(localDataSource, remoteDataSource, internetConnection)
+
+    @Provides
+    fun provideInternetConnection(): InternetConnection = InternetConnection(::isInternetAvailable)
 
     @Singleton
     @Provides

@@ -5,6 +5,7 @@ import com.hb.surfingcompose.data.responses.RecipeResponse
 import com.hb.surfingcompose.data.services.RecipesAPI
 import com.hb.surfingcompose.domain.request.RecipesRequest
 import javax.inject.Inject
+import kotlinx.coroutines.CancellationException
 
 
 class RemoteDataSourceImpl @Inject constructor(private val recipesApi: RecipesAPI) : RemoteDataSource {
@@ -18,6 +19,8 @@ class RemoteDataSourceImpl @Inject constructor(private val recipesApi: RecipesAP
                     SurfaceResult.Error(Exception("Something went wrong , code HTTP : ${code()}"))
                 }
             }
+        } catch (exception: CancellationException) {
+            throw exception
         } catch (exception: Exception) {
             SurfaceResult.Error(exception)
         }
