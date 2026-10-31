@@ -25,6 +25,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,7 +48,6 @@ import coil.request.ImageRequest
 import com.hb.surfingcompose.R
 import com.hb.surfingcompose.presentation.ROUTE_DETAILS_RECIPES
 import com.hb.surfingcompose.domain.models.RecipeModel
-import com.hb.surfingcompose.domain.request.RecipesRequest
 import com.hb.surfingcompose.presentation.viewmodel.RecipesViewModel
 import com.hb.surfingcompose.presentation.widgets.AppBar
 import com.hb.surfingcompose.presentation.widgets.useDebounce
@@ -57,7 +57,6 @@ fun RecipesListScreen(
     navController: NavController,
     viewModel: RecipesViewModel
 ) {
-    viewModel.getRecipesFlow()
     Surface(
         color = MaterialTheme.colors.background,
         modifier = Modifier.fillMaxSize()
@@ -67,10 +66,11 @@ fun RecipesListScreen(
             Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.margin_small)))
             SearchBar(
                 hint = stringResource(R.string.search_recipe),
+                initialText = viewModel.searchQuery.value,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(dimensionResource(id = R.dimen.margin_medium_small))
-            ) { viewModel.getRecipesFlow(RecipesRequest(it)) }
+            ) { viewModel.searchRecipes(it) }
             RecipeList(navController = navController, viewModel = viewModel)
         }
     }
@@ -80,10 +80,11 @@ fun RecipesListScreen(
 fun SearchBar(
     modifier: Modifier = Modifier,
     hint: String = "",
+    initialText: String = "",
     onSearch: (String) -> Unit = {}
 ) {
-    var text by remember { mutableStateOf("") }
-    var isHintDisplayed by remember { mutableStateOf(hint != "") }
+    var text by rememberSaveable { mutableStateOf(initialText) }
+    var isFocused by remember { mutableStateOf(false) }
 
     text.useDebounce { t -> onSearch(t) }
 
@@ -100,10 +101,10 @@ fun SearchBar(
                 .background(Color.White, shapes.large)
                 .padding(horizontal = dimensionResource(id = R.dimen.margin_medium_plus), vertical = dimensionResource(id = R.dimen.margin_medium_small))
                 .onFocusChanged {
-                    isHintDisplayed = it.isFocused != true && text.isEmpty()
+                    isFocused = it.isFocused
                 }
         )
-        if (isHintDisplayed) {
+        if (!isFocused && text.isEmpty()) {
             Text(
                 text = hint,
                 color = Color.LightGray,
@@ -121,11 +122,11 @@ fun RecipeList(navController: NavController, viewModel: RecipesViewModel) {
     val errorMessage by remember { viewModel.errorMessage }
     val isLoading by remember { viewModel.isLoading }
 
-    RecipeListView(recipes = recipeList, navController = navController, viewModel = viewModel)
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier.fillMaxSize()
     ) {
+        RecipeListView(recipes = recipeList, navController = navController, viewModel = viewModel)
         if (isLoading) CircularProgressIndicator(color = MaterialTheme.colors.primary)
         if (errorMessage.isNotEmpty()) RetryView(error = errorMessage) { viewModel.getRecipesFlow() }
     }

@@ -2,6 +2,9 @@ name: Android CI-CD
 
 on: push
 
+env:
+  RAPID_API_KEY: ${{ secrets.RAPID_API_KEY }}
+
 #  push:
 #    branches: [ main ]
 #  pull_request:
@@ -14,14 +17,9 @@ jobs:
 
     steps: # each job has a series of steps
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v5
 
       - uses: ./.github/actions/java-set-up
-
-      - name: Access RAPID_API_KEY
-        env:
-          RAPID_API_KEY: $
-        run: echo RAPID_API_KEY=\"$RAPID_API_KEY\" > ./local.properties
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
@@ -36,7 +34,7 @@ jobs:
     steps:
 
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v5
 
       - uses: ./.github/actions/java-set-up
 
@@ -57,7 +55,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v5
 
       - uses: ./.github/actions/java-set-up
 
@@ -76,7 +74,7 @@ jobs:
     steps:
 
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v5
 
       - uses: ./.github/actions/java-set-up
 
@@ -98,7 +96,7 @@ jobs:
     steps:
 
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v5
 
       - uses: ./.github/actions/java-set-up
 
@@ -118,12 +116,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v5
 
       - name: Download APK from build
         uses: actions/download-artifact@v4
         with:
           name: Android-APP-APK
+          path: Android-APP-APK
 
       - name: Upload Artifact to Firebase App Distribution
         uses: wzieba/Firebase-Distribution-Github-Action@v1
@@ -147,17 +146,19 @@ jobs:
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v5
 
       - name: Download APK
         uses: actions/download-artifact@v4
         with:
           name: Android-APP-APK
+          path: Android-APP-APK
 
       - name: Download TEST APK
         uses: actions/download-artifact@v4
         with:
           name: Android-APP-TEST-APK
+          path: Android-APP-TEST-APK
 
       - name: Run tests on Firebase Test Lab for API ${{ matrix.api }}
         uses: vacxe/firebase-test-lab-action@0.0.5

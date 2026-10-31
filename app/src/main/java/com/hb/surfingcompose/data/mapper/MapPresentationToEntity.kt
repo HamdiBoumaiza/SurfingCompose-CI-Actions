@@ -15,7 +15,7 @@ private fun List<TagsEntity>.toTagsResponse(): List<TagsResponse> {
 }
 
 private fun List<InstructionsEntity>.toInstructionResponse(): List<InstructionsResponse> {
-    return map { InstructionsResponse(displayText = it.displayText) }
+    return map { InstructionsResponse(displayText = it.displayText, position = it.position) }
 }
 
 private fun NutritionEntity.toNutritionResponse(): NutritionResponse {

@@ -16,6 +16,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavController
 import com.hb.surfingcompose.R
 import com.hb.surfingcompose.presentation.ROUTE_LIST_RECIPES
+import com.hb.surfingcompose.presentation.ROUTE_SPLASH_SCREEN
 import kotlinx.coroutines.delay
 
 
@@ -31,7 +32,10 @@ fun SplashScreen(navController: NavController) {
 
         LaunchedEffect(key1 = true, block = {
             delay(DELAY_SPLASH_SCREEN)
-            navController.navigate(ROUTE_LIST_RECIPES)
+            navController.navigate(ROUTE_LIST_RECIPES) {
+                popUpTo(ROUTE_SPLASH_SCREEN) { inclusive = true }
+                launchSingleTop = true
+            }
         })
 
         Column(
